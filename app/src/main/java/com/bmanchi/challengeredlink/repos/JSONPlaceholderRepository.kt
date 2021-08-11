@@ -1,8 +1,6 @@
 package com.bmanchi.challengeredlink.repos
 
-import android.content.res.Resources
 import androidx.lifecycle.MutableLiveData
-import com.bmanchi.challengeredlink.R
 import com.bmanchi.challengeredlink.api.RetrofitInstance
 import com.bmanchi.challengeredlink.models.AlbumsItem
 import com.bmanchi.challengeredlink.models.PhotosItem
@@ -10,8 +8,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-//TODO cambiar nombre general JsonAPIPlaceholder
-class AlbumsRepository {
+
+class JSONPlaceholderRepository {
 
     var albumResponse = MutableLiveData<ArrayList<AlbumsItem>>()
     var errorResponse = MutableLiveData<String>()

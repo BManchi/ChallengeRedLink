@@ -1,14 +1,11 @@
 package com.bmanchi.challengeredlink
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
-import androidx.appcompat.widget.SearchView
-
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isNotEmpty
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -22,54 +19,42 @@ import kotlinx.android.synthetic.main.main_activity.*
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var viewModel : MainViewModel
-    //
-    private val rvAdapter by lazy { AlbumAdapter{ album -> albumSeleccionado(album)} }
+    lateinit var viewModel: MainViewModel
+    private val rvAdapter by lazy { AlbumAdapter { album -> albumClicked(album) } }
 
     private lateinit var searchView: SearchView
-
-    private fun albumSeleccionado(album : AlbumsItem) {
-        Log.d("SELECCION", "album pasado ${album.id}")
-        viewModel.getPhotos(album.id)
-
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
-        val viewModelProviderFactory = MainViewModelProviderFactory(application)
-
         // Init VModel with custom ProviderFactory
-        viewModel = ViewModelProvider(this,viewModelProviderFactory).get(MainViewModel::class.java)
+        val viewModelProviderFactory = MainViewModelProviderFactory(application)
+        viewModel = ViewModelProvider(this, viewModelProviderFactory).get(MainViewModel::class.java)
 
         setupRecyclerView()
         initObservers()
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d("oncreate", "onCreate: volvemos del query? ${viewModel.currentSearch.value}")
-    }
-
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.search_menu, menu)
+
         val item = menu?.findItem(R.id.app_bar_search)
         searchView = item?.actionView as SearchView
 
+        // Restore pending query after activity destroy
+        // Bug fix rom https://www.youtube.com/watch?v=z3q943EPP5s
         val pendingQuery = viewModel.currentSearch.value
         if (pendingQuery != null && pendingQuery.isNotEmpty()) {
             item.expandActionView()
             searchView.setQuery(pendingQuery, false)
         }
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+
+        // Filter the RecyclerView's items
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 rvAdapter.filter.filter(newText)
-                //viewModel.currentSearch.value = newText
-                Log.d("query", "onQueryTextChange: $newText")
                 return false
             }
 
@@ -82,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        viewModel.liveDataAlbums.observe(this, Observer{
+        viewModel.liveDataAlbums.observe(this, Observer {
             it?.let {
                 rvAdapter.setData(it)
             }
@@ -90,14 +75,12 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.selectedPhotos.observe(this, Observer {
             it?.let {
-                Log.d("click", "initObservers: photoId ${it[1].id}")
                 addFragment(PhotosFragment())
             }
         })
 
         viewModel.errorDescription.observe(this, Observer {
             it?.let {
-                Log.d("TAG", "initObservers: error $it")
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             }
         })
@@ -124,4 +107,21 @@ class MainActivity : AppCompatActivity() {
         searchView.setOnQueryTextListener(null)
     }
 
+    // OnClick Album listener
+    private fun albumClicked(album: AlbumsItem) {
+        viewModel.getPhotos(album.id)
+    }
+
+    /**
+     * Resets selections so Observer doesn't call the fragment again.
+     * Bypasses the second back-press bug (focus of SearchView)
+     */
+    override fun onBackPressed() {
+        supportFragmentManager.fragments.forEach {
+            if (it is PhotosFragment) {
+                viewModel.selectedPhotos.value = null
+            }
+        }
+        super.onBackPressed()
+    }
 }

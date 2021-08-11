@@ -5,38 +5,32 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.bmanchi.challengeredlink.api.RetrofitInstance
-import com.bmanchi.challengeredlink.models.*
-import com.bmanchi.challengeredlink.repos.AlbumsRepository
-import com.google.gson.Gson
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.bmanchi.challengeredlink.models.AlbumsItem
+import com.bmanchi.challengeredlink.models.PhotosItem
+import com.bmanchi.challengeredlink.repos.JSONPlaceholderRepository
 
-class MainViewModel(val app: Application) : ViewModel() {
+class MainViewModel(app: Application) : ViewModel() {
 
-    private val repo = AlbumsRepository()
-    val liveDataAlbums : LiveData<ArrayList<AlbumsItem>> = Transformations.map(repo.albumResponse) { it }
-    //var liveDataPhotos : MutableLiveData<ArrayList<PhotosItem>> = Transformations.map(repo.photoResponse) { MutableLiveData<Arraylist<PhotosItem>>(it) }
+    private val repo = JSONPlaceholderRepository()
+    val liveDataAlbums: LiveData<ArrayList<AlbumsItem>> = Transformations.map(repo.albumResponse) { it }
     var selectedPhotos = MutableLiveData<ArrayList<PhotosItem>?>()
-    val searching = MutableLiveData(false)
     val currentSearch = MutableLiveData<String>()
-    val errorDescription : LiveData<String> = Transformations.map(repo.errorResponse) { it }
+    val errorDescription: LiveData<String> = Transformations.map(repo.errorResponse) { it }
 
     init {
         if (liveDataAlbums.value.isNullOrEmpty()) {
             getAlbums()
         }
-        repo.photoResponse.observeForever{
+        repo.photoResponse.observeForever {
             selectedPhotos.value = it
         }
     }
 
-    fun getAlbums(){
+    fun getAlbums() {
         repo.getAlbums()
     }
 
-    fun getPhotos(albumId : Int) {
+    fun getPhotos(albumId: Int) {
         repo.getPhotos(albumId)
     }
 }

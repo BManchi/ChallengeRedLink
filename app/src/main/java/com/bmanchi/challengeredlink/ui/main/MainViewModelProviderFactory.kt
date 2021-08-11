@@ -3,13 +3,18 @@ package com.bmanchi.challengeredlink.ui.main
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.bmanchi.challengeredlink.repos.AlbumsRepository
+
+/**
+ * Custom VM Provider to share a single VM between activities/fragments
+ * Grants data persistence between activities and its' lifecycles
+ * e.g. without this, screen rotation detached the VM from Fragment's recyclerview
+ */
 
 class MainViewModelProviderFactory (
     val app: Application
-    ) : ViewModelProvider.Factory {
+) : ViewModelProvider.Factory {
 
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MainViewModel(app) as T
-        }
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return MainViewModel(app) as T
     }
+}

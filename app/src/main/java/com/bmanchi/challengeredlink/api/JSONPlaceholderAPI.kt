@@ -6,7 +6,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface AlbumsAPI {
+interface JSONPlaceholderAPI {
 
     @GET("albums")
     fun getAlbums() :Call<ArrayList<AlbumsItem>>

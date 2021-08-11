@@ -1,6 +1,5 @@
 package com.bmanchi.challengeredlink.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,14 +40,6 @@ class AlbumAdapter(val onClick: (AlbumsItem) -> Unit) : RecyclerView.Adapter<Alb
 
     override fun onBindViewHolder(holder: AlbumViewholder, position: Int) {
         val currentAlbum = data[position]
-        /*holder.itemView.apply {
-            textViewAlbumId.text = album.id.toString()
-            textViewAlbumTitle.text = album.title
-
-            setOnClickListener {
-                onItemClickListener?.let { it(album) }
-            }
-        }*/
         holder.apply {
             id.text = currentAlbum.id.toString()
             title.text = currentAlbum.title
@@ -66,26 +57,9 @@ class AlbumAdapter(val onClick: (AlbumsItem) -> Unit) : RecyclerView.Adapter<Alb
         notifyDataSetChanged()
     }
 
-    //Get filter from https://medium.com/nerd-for-tech/implem-search-in-recyclerview-5bc18b547f4f
     override fun getFilter(): Filter {
         return object: Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-//                val charString = constraint?.toString() ?: ""
-//                if (charString.isEmpty()) {
-//                    dataFull = data
-//                } else {
-//                    val filteredData = ArrayList<AlbumsItem>()
-//                    data.filter {
-//                        (it.title.contains(constraint!!))
-//                    }
-//                        .forEach{ filteredData.add(it)}
-//                    dataFull = filteredData
-//                    Log.d(
-//                        "searchFilter",
-//                        "performFiltering: first title result = ${dataFull[1].title}"
-//                    )
-//                }
-//                return FilterResults().apply { values = dataFull }
                 val filteredList = ArrayList<AlbumsItem>()
                 if (constraint.isNullOrEmpty()) {
                     filteredList.addAll(dataFull)
@@ -101,18 +75,10 @@ class AlbumAdapter(val onClick: (AlbumsItem) -> Unit) : RecyclerView.Adapter<Alb
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                /*data = if (results?.values == null) {
-                    ArrayList()
-                }
-                else {
-                    results.values as ArrayList<AlbumsItem>
-                }
-                notifyDataSetChanged()*/
                 data.clear()
                 data.addAll(results!!.values as Collection<AlbumsItem>)
                 notifyDataSetChanged()
             }
         }
     }
-
 }

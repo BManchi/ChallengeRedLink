@@ -17,7 +17,7 @@ class RetrofitInstance {
         }
 
         val api by lazy {
-            retrofit.create(AlbumsAPI::class.java)
+            retrofit.create(JSONPlaceholderAPI::class.java)
         }
     }
 }

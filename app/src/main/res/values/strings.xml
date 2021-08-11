@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Challenge RedLink</string>
+    <string name="search_menu">Buscar álbumes</string>
+    <string name="ERROR_GEN">Error genérico</string>
+</resources>
